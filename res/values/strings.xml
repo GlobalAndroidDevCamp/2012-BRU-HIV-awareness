@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="hello">Hello World, HIVAwarenessActivity!</string>
+    <string name="app_name">HIV Awareness</string>
+    <string name="gender2">Gender</string>
+    <string name="bottom">Hold another phone with NFC against yours to pass it on and see what happens</string>
+    <string-array name="gender">
+        <item >Male</item>
+        <item >Female</item>
+    </string-array>
+</resources>
