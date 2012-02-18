@@ -47,7 +47,6 @@ public class HIVAwarenessActivity extends Activity implements OnClickListener, C
         }
     }
 
-	@Override
 	public void onClick(View v) {
 		if(v.getId()==R.id.button1){
 	        FragmentManager fragmentManager = getFragmentManager();
@@ -75,7 +74,6 @@ public class HIVAwarenessActivity extends Activity implements OnClickListener, C
 	    return true;
 	}
 	
-    @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         String text = ""+caught ;
         NdefMessage msg = new NdefMessage(
