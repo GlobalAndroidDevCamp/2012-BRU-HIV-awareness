@@ -9,7 +9,7 @@
         android:id="@+id/touch_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="net.lp.hivawareness.BottomFragment" >
+        android:name="net.lp.hivawareness.v4.BottomFragment" >
 
         <!-- Preview: layout=@layout/touch -->
     </fragment>
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:name="net.lp.hivawareness.StartFragment" >
+        android:name="net.lp.hivawareness.v4.StartFragment" >
 
         <!-- Preview: layout=@layout/start -->
     </fragment>

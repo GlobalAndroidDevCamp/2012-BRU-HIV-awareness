@@ -1,10 +1,11 @@
 /**
  * 
  */
-package net.lp.hivawareness;
+package net.lp.hivawareness.v4;
 
-import android.app.Fragment;
+import net.lp.hivawareness.R;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

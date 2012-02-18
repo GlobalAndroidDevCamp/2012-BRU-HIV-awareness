@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.gridlayout.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:gridlayout="http://schemas.android.com/apk/res/net.lp.hivawareness"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="6"
-    android:rowCount="7"
+    gridlayout:columnCount="7"
+    gridlayout:rowCount="4"    
     android:useDefaultMargins="true" >
     
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -84,4 +85,4 @@
         android:layout_row="6"
         android:text="Generate" />
 
-</GridLayout>
+</com.gridlayout.GridLayout>
