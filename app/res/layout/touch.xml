@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:useDefaultMargins="true"
+    android:padding="7dip" >
 
     <TextView
         android:id="@+id/number"
@@ -11,8 +13,8 @@
         android:text="1"
         android:paddingLeft="10dip"
         android:paddingRight="10dip"
-        android:paddingBottom="3dip"
-        android:paddingTop="3dip"
+        android:paddingBottom="4dip"
+        android:paddingTop="4dip"
         android:background="@drawable/number"
         android:layout_weight="0" />
     
@@ -30,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dip"
-        android:text="@string/bottom"
+        android:text="@string/touch_advice"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_weight="1" />
 

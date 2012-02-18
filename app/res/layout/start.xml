@@ -5,12 +5,51 @@
     android:columnCount="6"
     android:rowCount="7"
     android:useDefaultMargins="true" >
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_column="3"
+    android:layout_row="1"
+    android:orientation="horizontal" >
+
+	    <TextView
+	        android:id="@+id/number"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="2"
+	        android:paddingLeft="10dip"
+	        android:paddingRight="10dip"
+	        android:paddingBottom="4dip"
+	        android:paddingTop="4dip"
+	        android:background="@drawable/number"
+	        android:layout_weight="0" />
+	    
+	    <ImageView
+	        android:id="@+id/android"
+	        android:layout_width="50dip"
+	        android:layout_height="match_parent"
+	        android:src="@drawable/android_shame"
+	        android:padding="2dip"
+	        android:layout_weight="0"
+	        android:layout_gravity="top" />
+	    
+	    <TextView
+	        android:id="@+id/text"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:padding="5dip"
+	        android:text="@string/start_advice"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:layout_weight="1" />
+	
+	</LinearLayout>
 
     <EditText
         android:id="@+id/editText1"
         android:layout_width="match_parent"
         android:layout_column="3"
-        android:layout_row="1"
+        android:layout_row="2"
         android:inputType="textPersonName"
         android:text="Name" >
 
@@ -21,7 +60,7 @@
         android:id="@+id/editText2"
         android:layout_width="match_parent"
         android:layout_column="3"
-        android:layout_row="2"
+        android:layout_row="3"
         android:inputType="number"
         android:text="Age" />
 
@@ -29,20 +68,20 @@
         android:id="@+id/spinner1"
         android:layout_width="match_parent"
         android:layout_column="3"
-        android:layout_row="3" />
+        android:layout_row="4" />
 
     <Spinner
         android:id="@+id/spinner2"
         android:layout_width="match_parent"
         android:layout_column="3"
-        android:layout_row="4"
+        android:layout_row="5"
         android:entries="@array/gender"
         android:prompt="@string/gender2" />
 
     <Button
         android:id="@+id/button1"
         android:layout_column="3"
-        android:layout_row="5"
+        android:layout_row="6"
         android:text="Generate" />
 
 </GridLayout>
