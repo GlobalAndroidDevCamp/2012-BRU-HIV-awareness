@@ -56,7 +56,7 @@ public class HIVAwarenessActivity extends Activity implements OnClickListener, C
 	        // and add the transaction to the back stack
 	        transaction.replace(R.id.fragment_container, fragmentManager.findFragmentById(R.id.start_fragment));//TODO
 	        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-	        transaction.addToBackStack(null);
+	        transaction.addToBackStack("started");
 	
 	        // Commit the transaction
 	        transaction.commit();
