@@ -3,7 +3,8 @@
     <string name="hello">Hello World, HIVAwarenessActivity!</string>
     <string name="app_name">HIV Awareness</string>
     <string name="gender2">Gender</string>
-    <string name="bottom">Touch another phone (with NFC). Make Love!</string>
+    <string name="touch_advice">Touch another phone (with NFC). Make Love!</string>
+    <string name="start_advice">Or start with a personal infection probability by filling in this form:</string>
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
