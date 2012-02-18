@@ -114,7 +114,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	}
 
 	public NdefMessage createNdefMessage() {
-		String text = "" + caught + "|" + mData;
+		String text = "" + caught + "|" + mGender.name();
 		NdefMessage msg = new NdefMessage(new NdefRecord[] { createMimeRecord(
 				"application/net.lp.hivawareness.beam", text.getBytes())
 		/**
@@ -167,12 +167,16 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 				.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 		// only one message sent during the beam
 		NdefMessage msg = (NdefMessage) rawMsgs[0];
+
+		String data = new String(msg.getRecords()[0].getPayload());
+		String[] parts = data.split("\\|");
+		
 		// record 0 contains the MIME type, record 1 is the AAR, if present
 		Log.v("HIV", "old status " + caught);
 
-		double partnerInfected = Double.parseDouble(new String(
-				msg.getRecords()[0].getPayload()));
-		updateInfectionStatus(partnerInfected, Gender.male);
+		double partnerInfected = Double.parseDouble(parts[0]);
+		Gender partnerGender = Gender.valueOf(parts[1]);
+		updateInfectionStatus(partnerInfected, partnerGender);
 
 		Log.v("HIV", "new status " + caught);
 
