@@ -9,7 +9,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1"
-        android:padding="10dip"
+        android:paddingLeft="10dip"
+        android:paddingRight="10dip"
+        android:paddingBottom="3dip"
+        android:paddingTop="3dip"
         android:background="@drawable/number"
         android:layout_weight="0" />
     
