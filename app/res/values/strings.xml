@@ -15,6 +15,7 @@
         <item>Sub-Sahara Africa</item>
         <item>Middle East/North Africa</item>
         <item>South/South East Asia</item>
+        <item>East Asia</item>
         <item>Oceania</item>
         <item>Central/South America</item>
         <item>Caribean</item>
@@ -27,7 +28,10 @@
     <string name="pref_gender_summary">Female are more likely to get HIV</string>
     <string name="pref_region_title">Region</string>
     <string name="pref_region_summary">In Africa HIV is most prevealed</string>
-    
+  
+    <string name="infected_at_beginning">You were infected from the beginning</string>
+    <string name="infected_when">You were infected after you made love with %d friends. Inform those your friends you met thereafter.</string>
+    <string name="not_infected">You are lucky and you are not infected.</string>
     
     <!-- Chooser items -->
     <!--
