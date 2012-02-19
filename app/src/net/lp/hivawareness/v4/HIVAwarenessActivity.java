@@ -550,8 +550,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 		editor.commit();
 
-		// game over after 10 touches
-		if (history > 1) {
+		// game over after 5 touches
+		if (history > 5) {
 			finishGame(caught == 1, prefs.getInt(PREFS_HISTORY_INFECTED, 0));
 		}
 
@@ -575,6 +575,14 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
 		am.set(AlarmManager.RTC, System.currentTimeMillis(), operation);
+		
+		// clear history
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		Editor editor = prefs.edit();
+		editor.remove(PREFS_HISTORY);
+		editor.remove(PREFS_HISTORY_INFECTED);
+		editor.commit();
 	}
 
 	/**
