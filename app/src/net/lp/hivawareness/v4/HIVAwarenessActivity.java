@@ -13,7 +13,6 @@ import android.content.IntentFilter.MalformedMimeTypeException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -25,7 +24,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class HIVAwarenessActivity extends FragmentActivity implements
@@ -37,9 +37,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	private String[][] mTechListsArray;
 	private PendingIntent mPendingIntent;
 	private String mData;
-	private Gender mGender = Gender.male;
-	private Region mEthnic;
-	private boolean mUseWorld = true;
+	public Gender mGender = Gender.male;
+	public Region mRegion;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -70,10 +69,21 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 		mIntentFiltersArray = new IntentFilter[] { ndef };
 		mTechListsArray = new String[][] { new String[] { NfcF.class.getName() } };
+		
+		calculateInitial(true);
 	}
 
 	public void onClick(View v) {
 		if (v.getId() == R.id.button1) {
+			int genderPos = ((Spinner)findViewById(R.id.spinner_gender)).getSelectedItemPosition();
+			mGender = Gender.values()[genderPos];
+			
+			int regionPos = ((Spinner)findViewById(R.id.spinner_region)).getSelectedItemPosition();
+			mRegion = Region.values()[regionPos];
+
+			mNfcAdapter.disableForegroundNdefPush(this);
+			mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
+			
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			FragmentTransaction transaction = fragmentManager
 					.beginTransaction();
@@ -91,21 +101,38 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			// Commit the transaction
 			transaction.commit();
 
-			if (!ran) {
-				if (mUseWorld) {
-					caught = (int) Math.floor(Math.random()
-							+ (Probability.worldwide * Probability.scale));
-				} else {
-					caught = (int) Math
-							.floor(Math.random()
-									+ (Probability.fromData(mGender, mEthnic) * Probability.scale));
-				}
+			calculateInitial(false);
+			
+			TextView tv = ((TextView)findViewById(R.id.debug));
+			if(tv!=null){
+				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
 			}
 		}else if (v.getId() == R.id.startover_button) {
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.popBackStack();
+
+			calculateInitial(true);
 			
-			caught = 0;
+			TextView tv = ((TextView)findViewById(R.id.debug));
+			if(tv!=null){
+				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected void calculateInitial(boolean worldCitizen) {
+		if (!ran) {//TODO: add to preferences
+			double prob;
+			if (worldCitizen) {
+				prob = Probability.worldwide * Probability.scale;
+			} else {
+				prob = Probability.fromData(mGender, mRegion) * Probability.scale;
+			}
+			caught = (int) Math.floor(Math.random()
+					+ Math.min(1, prob));
 		}
 	}
 
@@ -211,6 +238,12 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
 			double random = Math.random();
 			caught = (int) Math.floor(random + (factor * Probability.scale));
+			
+			TextView tv = ((TextView)findViewById(R.id.debug));
+			if(tv!=null){
+				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
+			}
+			
 		}
 	}
 
