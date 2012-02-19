@@ -1,7 +1,6 @@
 package net.lp.hivawareness.v4;
 
 import java.nio.charset.Charset;
-import java.util.prefs.Preferences;
 
 import net.lp.hivawareness.R;
 import net.lp.hivawareness.domain.Gender;
@@ -14,16 +13,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -36,13 +32,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -226,6 +220,31 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
         return dialog;
     }
+    
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onDestroy()
+	 */
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		//Close cursor and free memory
+
+		try {
+			removeDialog(HELP_DIALOG_ID);
+		} catch (IllegalArgumentException e) {
+			//nothing
+		}
+		try {
+			removeDialog(SMOKING_DIALOG_ID);
+		} catch (IllegalArgumentException e) {
+			//nothing
+		}
+		
+	}
 	
 	private void showAboutDialog() {
 		Intent intent=new Intent(AboutIntents.ACTION_SHOW_ABOUT_DIALOG);
