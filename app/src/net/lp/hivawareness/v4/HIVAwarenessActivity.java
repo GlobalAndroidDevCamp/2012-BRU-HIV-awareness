@@ -35,8 +35,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	private boolean ran = false;
 	private IntentFilter[] mIntentFiltersArray;
 	private String[][] mTechListsArray;
-	private PendingIntent mPendingIntent;
-	private String mData;
+	private PendingIntent mPendingIntent;	
 	private Gender mGender = Gender.male;
 	private Region mEthnic;
 	private boolean mUseWorld = true;

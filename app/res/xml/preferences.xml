@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    
+   
+    <PreferenceCategory android:title="@string/pref_probabilities">               
+        <ListPreference  
+            android:key="gender"
+            android:entries="@array/gender" 
+            android:title="@string/pref_gender_title"
+            android:summary="@string/pref_gender_summary"
+            />
+        <ListPreference  
+            android:key="region"
+            android:entries="@array/region"
+            android:title="@string/pref_region_title"
+            android:summary="@string/pref_region_summary"
+            />
+        
+    </PreferenceCategory>
+
+</PreferenceScreen>
