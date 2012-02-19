@@ -1,7 +1,7 @@
 package net.lp.hivawareness.domain;
 
 public class Probability {
-	public final static double worldwide = 35 / 6500; // 8 billion people and 35
+	public final static double worldwide = 35 / 6500d; // 8 billion people and 35
 														// million infected
 														// humans in 2010
 	public final static double scale = 10;
@@ -12,12 +12,11 @@ public class Probability {
 
 	
 	public static double fromData(Gender gender, Region region) {
-		if (Gender.male == gender) {
-			return (region.getProbability() * 0.4)
-					+ (1 - region.getProbability()) * 0.6;
+		if (Gender.male == gender) {//Males have 50% more chance of being infected.
+			return region.getProbability() * 1.2;
+			//american male: prob = 0,001141053 * 1.2 = 0,001369264
 		} else {
-			return (region.getProbability() * 0.6)
-					+ (1 - region.getProbability()) * 0.4;
+			return region.getProbability() * 0.8;
 		}
 	}
 

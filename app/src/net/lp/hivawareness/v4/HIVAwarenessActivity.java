@@ -38,7 +38,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	private PendingIntent mPendingIntent;
 	private String mData;
 	public Gender mGender = Gender.male;
-	public Region mRegion;
+	public Region mRegion = Region.american;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -102,21 +102,11 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			transaction.commit();
 
 			calculateInitial(false);
-			
-			TextView tv = ((TextView)findViewById(R.id.debug));
-			if(tv!=null){
-				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
-			}
 		}else if (v.getId() == R.id.startover_button) {
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.popBackStack();
 
 			calculateInitial(true);
-			
-			TextView tv = ((TextView)findViewById(R.id.debug));
-			if(tv!=null){
-				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
-			}
 		}
 	}
 
@@ -124,8 +114,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	 * 
 	 */
 	protected void calculateInitial(boolean worldCitizen) {
+		double prob=0;
 		if (!ran) {//TODO: add to preferences
-			double prob;
 			if (worldCitizen) {
 				prob = Probability.worldwide * Probability.scale;
 			} else {
@@ -133,6 +123,12 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			}
 			caught = (int) Math.floor(Math.random()
 					+ Math.min(1, prob));
+		}
+
+		
+		TextView tv = ((TextView)findViewById(R.id.debug));
+		if(tv!=null){
+			tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString()+", Prob="+prob);
 		}
 	}
 
@@ -237,11 +233,11 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			}
 
 			double random = Math.random();
-			caught = (int) Math.floor(random + (factor * Probability.scale));
+			caught = (int) Math.floor(random + (factor * Probability.scale));//TODO
 			
 			TextView tv = ((TextView)findViewById(R.id.debug));
 			if(tv!=null){
-				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
+				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString()+", Prob="+(factor * Probability.scale));
 			}
 			
 		}

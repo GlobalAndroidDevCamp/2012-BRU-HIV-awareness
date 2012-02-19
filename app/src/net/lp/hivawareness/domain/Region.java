@@ -12,4 +12,6 @@ public enum Region {
 	public double getProbability(){
 		return mProb;
 	}
+	
+	//american prob = 0,002852632
 }
