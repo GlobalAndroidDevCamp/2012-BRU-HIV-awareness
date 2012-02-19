@@ -6,12 +6,15 @@ import net.lp.hivawareness.R;
 import net.lp.hivawareness.domain.Gender;
 import net.lp.hivawareness.domain.Probability;
 import net.lp.hivawareness.domain.Region;
+import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
-import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -36,6 +39,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	private static final String PREFS_GENDER = "gender";
 	private static final String PREFS_REGION = "region";
 	private static final String PREFS_INFECTED = "infected";
+	private static final String PREFS_HISTORY = "history";
+	private static final String PREFS_HISTORY_INFECTED = "history_infected";
+	
 	private NfcAdapter mNfcAdapter;
 	private int caught = 0;
 	private boolean ran = false;
@@ -129,6 +135,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 				tv.setText("caught=" + caught + ", Gender="
 						+ mGender.toString() + ", Region=" + mRegion.toString());
 			}
+			
+			finishGame(caught == 1, 1);
+			
 		} else if (v.getId() == R.id.startover_button) {
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.popBackStack();
@@ -143,7 +152,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			TextView tv = ((TextView) findViewById(R.id.debug));
 			if (tv != null) {
 				tv.setText("caught=" + caught + ", Gender="
-						+ mGender.toString() + ", Region=" + mRegion.toString());
+						+ mGender.toString() + ", Region=" + mRegion);
 			}
 		}
 	}
@@ -153,7 +162,13 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 				.getDefaultSharedPreferences(this);
 		Editor editor = prefs.edit();
 		editor.putString(PREFS_GENDER, mGender.name());
-		editor.putString(PREFS_REGION, mRegion.name());
+		
+		if (mRegion != null){
+			editor.putString(PREFS_REGION, mRegion.name());
+		} else {
+			editor.putString(PREFS_REGION, null);
+		}
+		
 		editor.putInt(PREFS_INFECTED, caught);
 		editor.commit();
 
@@ -210,6 +225,10 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
 		mNfcAdapter.enableForegroundDispatch(this, mPendingIntent,
 				mIntentFiltersArray, mTechListsArray);
+		
+		NotificationManager nm = (NotificationManager) this
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(1);
 	}
 
 	@Override
@@ -253,6 +272,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	}
 
 	private void updateInfectionStatus(double partnerInfected, Gender gender) {
+		int caughtOld = caught;
+		
 		if (caught == 0d && partnerInfected > 0) {
 
 			double factor;
@@ -278,7 +299,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
 			double random = Math.random();
 			caught = (int) Math.floor(random + (factor * Probability.scale));
-
+			
 			storePreferences();
 			
 			// output values
@@ -289,6 +310,47 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			}
 
 		}
+		
+		// store history
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		Editor editor = prefs.edit();
+		int history = prefs.getInt(PREFS_HISTORY, 0);		
+		history++;
+		editor.putInt(PREFS_HISTORY, history);
+		
+		if (caughtOld == 0 && caught == 1 ){
+			// remember when you were infected
+			int historyInfected = history;
+			editor.putInt(PREFS_HISTORY_INFECTED, historyInfected);			
+		}
+		editor.commit();
+		
+		// game over after 10 touches
+		if (history  > 1){			
+			finishGame(caught == 1, prefs.getInt(PREFS_HISTORY_INFECTED, 0));
+		}
+		
+		
+	}
+
+	private void finishGame(boolean infected, int whenInfected) {
+		
+		
+		String msg;
+		if (infected && whenInfected == 0){
+			msg = getString(R.string.infected_at_beginning);
+		} else if (infected) {
+			msg = getString(R.string.infected_when, whenInfected);
+		} else {
+			msg = getString(R.string.not_infected);
+		}
+		
+		Intent intent = new Intent(this, AlertReceiver.class);
+		intent.putExtra("message",msg);
+		PendingIntent operation = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);		
+		am.set(AlarmManager.RTC, System.currentTimeMillis(), operation);
 	}
 
 	/**

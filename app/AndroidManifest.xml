@@ -10,10 +10,10 @@
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.INTERNET" />
- <!-- Flurry, Google Analytics and more -->
+    <!-- Flurry, Google Analytics and more -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
- <!-- Google Analytics -->
+    <!-- Google Analytics -->
 
     <application
         android:icon="@drawable/logo"
@@ -29,10 +29,23 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/net.lp.hivawareness.beam" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".v4.AlertReceiver" />
+        <receiver android:name=".v4.AppWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
     </application>
 
 </manifest>
