@@ -52,7 +52,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	public Gender mGender;
 	public Region mRegion;
 
-	final static private boolean DEBUG = true;
+	final static private boolean DEBUG = false;
 
 	/**
 	 * Dialog ids
