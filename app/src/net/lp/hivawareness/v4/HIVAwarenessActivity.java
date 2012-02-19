@@ -339,6 +339,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
 			processIntent(getIntent());
 		}
+		
+		// TODO sending messages at the same time do not work !race condition
 		mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
 		mNfcAdapter.enableForegroundDispatch(this, mPendingIntent,
 				mIntentFiltersArray, mTechListsArray);
@@ -374,7 +376,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		String[] parts = data.split("\\|");
 
 		// record 0 contains the MIME type, record 1 is the AAR, if present
-		Log.v("HIV", "old status " + caught);
+		Log.v("HIV", "old status " + caught + " " + data);
 
 		double partnerInfected = Double.parseDouble(parts[0]);
 		Gender partnerGender = Gender.valueOf(parts[1]);
@@ -387,9 +389,10 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	}
 
 	private void updateInfectionStatus(double partnerInfected, Gender gender) {
-		if (caught == 0d && partnerInfected > 0) {
-
-			double factor;
+		double factor = 0;
+		if (caught == 0 && partnerInfected > 0) {
+			
+		
 
 			if (mGender == Gender.male) {
 
@@ -413,14 +416,16 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			double random = Math.random();
 			caught = (int) Math.floor(random + (factor * Probability.scale));// TODO
 
-			if (DEBUG) {
-				TextView tv = ((TextView) findViewById(R.id.debug));
-				if (tv != null) {
-					tv.setText("caught=" + caught + ", Gender="
-							+ mGender.toString() + ", Region="
-							+ (mRegion == null ? "world" : mRegion.toString())
-							+ ", Prob=" + (factor * Probability.scale));
-				}
+			
+		}
+		
+		if (DEBUG) {
+			TextView tv = ((TextView) findViewById(R.id.debug));
+			if (tv != null) {
+				tv.setText("caught=" + caught + ", Gender="
+						+ mGender.toString() + ", Region="
+						+ (mRegion == null ? "world" : mRegion.toString())
+						+ ", ProbIC=" + (factor * Probability.scale));
 			}
 		}
 	}
