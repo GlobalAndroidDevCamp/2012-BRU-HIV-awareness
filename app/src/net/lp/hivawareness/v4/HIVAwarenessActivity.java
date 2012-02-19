@@ -37,9 +37,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	private boolean ran = false;
 	private IntentFilter[] mIntentFiltersArray;
 	private String[][] mTechListsArray;
-	private PendingIntent mPendingIntent;
-	private String mData;
-	public Gender mGender = Gender.male;
+	private PendingIntent mPendingIntent;	
+	public Gender mGender;
 	public Region mRegion;
 
 	/** Called when the activity is first created. */
@@ -55,19 +54,14 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		if (region == null){
 			mRegion = null;
 		}
-
+		calculateInitial(mRegion == null);
+	
 		// Check for available NFC Adapter
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (mNfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
-					.show();
-			// finish();
-			// return;
-		} else {
-			// Register callback
-
-		}
-
+					.show();			
+		} 
 		mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
 				getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
@@ -80,7 +74,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		mIntentFiltersArray = new IntentFilter[] { ndef };
 		mTechListsArray = new String[][] { new String[] { NfcF.class.getName() } };
 		
-		calculateInitial(true);
+		
 	}
 
 	public void onClick(View v) {
@@ -120,7 +114,10 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}else if (v.getId() == R.id.startover_button) {
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.popBackStack();
-
+			
+			mGender = Gender.male;
+			mRegion = null;
+			
 			calculateInitial(true);
 			
 			TextView tv = ((TextView)findViewById(R.id.debug));

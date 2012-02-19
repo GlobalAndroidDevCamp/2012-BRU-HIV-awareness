@@ -1,7 +1,7 @@
 package net.lp.hivawareness.domain;
 
 public enum Region {
-	american (1 + 0.07 + 1.4 + 0.24 / 950), european (2.3 / 700), asian ( 0.02), australian (0.02/35), african (23 / 1000);
+	subSahraAfrican(0.05), middleEast(0.002), southAsia(0.003), eastAsia(0.001), oceania(0.003), centralAmerica(0.005), caribbean(0.01), easternEurope(0.008), westernEurope(0.002), northAmerica(0.002);
 	
 	private final double mProb;
 	

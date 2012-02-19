@@ -12,11 +12,15 @@
     </string-array>
     <string name="region2">Region</string>
     <string-array name="region">
-        <item>American</item>
-        <item>European</item>
-        <item>Asian</item>
-        <item>Australian</item>
-        <item>African</item>
+        <item>Sub-Sahara Africa</item>
+        <item>Middle East/North Africa</item>
+        <item>South/South East Asia</item>
+        <item>Oceania</item>
+        <item>Central/South America</item>
+        <item>Caribean</item>
+        <item>Eastern Europe/Central Asia</item>
+        <item>Western/Central Europe</item>
+        <item>North America</item>
     </string-array>
     
     <string name="pref_probabilities">Probability Factors</string>
