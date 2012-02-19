@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--
+**
+** 	 Copyright (C) 2008-2009 pjv (and others, see About dialog)
+** 
+** 	 This file is part of Collectionista.
+**
+**   Collectionista is free software: you can redistribute it and/or modify
+**   it under the terms of the GNU General Public License as published by
+**   the Free Software Foundation, either version 3 of the License, or
+**   (at your option) any later version.
+**
+**   Collectionista is distributed in the hope that it will be useful,
+**   but WITHOUT ANY WARRANTY; without even the implied warranty of
+**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**   GNU General Public License for more details.
+**
+**   You should have received a copy of the GNU General Public License
+**   along with Collectionista.  If not, see <http://www.gnu.org/licenses/>.
+*/
+-->
+<resources>
+    <!-- About box information -->
+    <!--
+	 Description about the app
+	-->
+    <string name="about_comments">
+	A game that shows why you need to be aware of HIV/AIDS (SIDA)
+</string>
+    <!--
+	 Copyright message. Add your name here, separated with comma's, if you helped out
+	-->
+    <string name="about_copyright">Copyright © 2012 pjv, Friedger</string>
+    <!--
+	 Label for the website link
+	-->
+    <string name="about_website_label">HIV Awareness on GADC wiki</string>
+    <!--
+	 Website link
+	-->
+    <string name="about_website_url">http://gadcbru.wikia.com/wiki/HIV_Awareness_hack</string>
+    <!--
+	 Translators descriptions
+	-->
+    <string name="about_translators">translator-credits</string>
+    <!--
+	 Feedback link
+	-->
+    <string name="about_feedback">https://github.com/GlobalAndroidDevCamp/BRU-HIV-awareness</string>
+    <!--
+	 Message to display if OI About is not installed.
+	-->
+    <string name="about_backup">To view information about this app you need to install OI About. See http://www.openintents.org/ or the Market.</string>
+
+    <!-- External dependencies -->
+    <!--
+	 Link to OI About
+	-->
+    <string name="link_about_dialog">market://search?q=pname:org.openintents.about</string>
+    <!--
+	 Message to display if the Market is not installed
+	-->
+    <string name="market_backup">You do not seem to have the Android Market app installed. Ignoring.</string>
+    
+</resources>

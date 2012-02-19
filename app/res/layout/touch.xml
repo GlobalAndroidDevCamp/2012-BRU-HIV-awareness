@@ -17,6 +17,15 @@
         android:background="@drawable/number"
         android:layout_weight="0" />
     
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dip"
+        android:text="@string/touch_advice"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_weight="1" />
+    
     <ImageView
         android:id="@+id/android"
         android:layout_width="50dip"
@@ -27,16 +36,8 @@
         android:layout_gravity="top" />
     
     <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dip"
-        android:text="@string/touch_advice"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_weight="1" />
-    
-    <TextView
         android:id="@+id/debug"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dip"

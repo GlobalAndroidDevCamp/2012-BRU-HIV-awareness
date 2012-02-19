@@ -29,12 +29,7 @@ public class StartedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.started, container, false);
-
-		Button b2 = (Button) view.findViewById(R.id.startover_button);
-		b2.setOnClickListener((View.OnClickListener)getActivity());
-		
-		return view;
+        return inflater.inflate(R.layout.started, container, false);
     }
 
 	/* (non-Javadoc)

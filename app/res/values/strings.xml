@@ -3,9 +3,9 @@
     <string name="hello">Hello World, HIVAwarenessActivity!</string>
     <string name="app_name">HIV Awareness</string>
     <string name="gender2">Gender</string>
-    <string name="touch_advice">Touch another phone (with NFC). Make Love!</string>
-    <string name="start_advice">Or start with a personal infection probability by filling in this form:</string>
-    <string name="started_advice">You may or may not be infected.</string>
+    <string name="touch_advice"><b>Touch</b> another phone. <i>Make Love!</i></string>
+    <string name="start_advice">Or provide more data for a custom likelihood that you are already \'infected\':</string>
+    <string name="started_advice">You may or may not be infected. We don\'t reveal this yet. Now touch a phone.</string>
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
@@ -22,10 +22,44 @@
         <item>Western/Central Europe</item>
         <item>North America</item>
     </string-array>
-    
     <string name="pref_probabilities">Probability Factors</string>
     <string name="pref_gender_title">Gender</string>
     <string name="pref_gender_summary">Female are more likely to get HIV</string>
     <string name="pref_region_title">Region</string>
     <string name="pref_region_summary">In Africa HIV is most prevealed</string>
+    
+    
+    <!-- Chooser items -->
+    <!--
+		Title for the choice of actions offered after using the send menu item.
+	-->
+    <string name="chooser_send_action">Send via:</string>
+    <!--
+	 	Template text to send a feedback mail to the developer. Formed when user selects 'Give feedback' menu item.
+	-->
+    <string name="template_feedback">My feedback: \n\n</string>
+    <!--
+	 	Subject for feedback emails etc. that use the template text.
+	-->
+    <string name="template_feedback_subject">Feedback on HIV Awareness</string>
+    <!--
+	 	Template text to send a recommendation mail to friends to appraise this app. Formed when user selects 'Share app' menu item.
+	-->
+    <string name="template_share_app">Try this Android app I found for World AIDS Day: HIV Awareness\n\nSearch in the Android Market for \'HIV Awareness\' or open http://market.android.com/search?q=pname:net.lp.hivawareness in your phone\'s browser.</string>
+    <!--
+	 	Subject for recommendation emails etc. that use the template text.
+	-->
+    <string name="template_share_app_subject">Try this Android app I found: HIV Awareness</string>
+    
+    <!-- Main dialogs -->
+    <string name="dialog_help_title">Help</string>
+    <string name="dialog_help_message">HIV Awareness is still in <b>beta</b>. It simulates HIV infection with exaggerated probabilities from the real world, where touching two phones is the \'deed\'.
+    \n\nTouch another phone with NFC capabilities and start with the global average probability, or set your custom probability first by providing data.
+    \n\nThis probability represents the chance you already have HIV today and initializes you as part of our virtual base population. When interacting with others, we use other likelihoods of passing on - or getting passed on - the infection (when present). Only one device can infect the other.
+    \n\nOnly after 5 interactions do we reveal if you had/have HIV. Purpose is to work out an app that can playfully create awareness about the still present dangers of inadequate protection against HIV.</string>
+  
+    <string name="dialog_smoking_title">You touched a phone!</string>
+    <string name="dialog_smoking_message">Feels good huh? Enjoy the cigarette.</string>
+    <string name="dialog_smoking_message2">We don\'t reveal yet whether you were infected.</string>
+      
 </resources>
