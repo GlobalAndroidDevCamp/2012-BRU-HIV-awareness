@@ -5,8 +5,17 @@
     <string name="gender2">Gender</string>
     <string name="touch_advice">Touch another phone (with NFC). Make Love!</string>
     <string name="start_advice">Or start with a personal infection probability by filling in this form:</string>
+    <string name="started_advice">You may or may not be infected.</string>
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
+    </string-array>
+    <string name="region2">Region</string>
+    <string-array name="region">
+        <item>American</item>
+        <item>European</item>
+        <item>Asian</item>
+        <item>Australian</item>
+        <item>African</item>
     </string-array>
 </resources>

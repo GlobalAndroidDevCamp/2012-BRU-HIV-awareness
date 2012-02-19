@@ -4,6 +4,7 @@
 package net.lp.hivawareness.v4;
 
 import net.lp.hivawareness.R;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,12 +16,12 @@ import android.widget.Button;
  * @author pjv
  *
  */
-public class StartFragment extends Fragment {
+public class StartedFragment extends Fragment {
 
 	/**
 	 * 
 	 */
-	public StartFragment() {
+	public StartedFragment() {
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -28,10 +29,10 @@ public class StartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.start, container, false);
-        
-		Button b = (Button) view.findViewById(R.id.button1);
-		b.setOnClickListener((View.OnClickListener)getActivity());
+        View view = inflater.inflate(R.layout.started, container, false);
+
+		Button b2 = (Button) view.findViewById(R.id.startover_button);
+		b2.setOnClickListener((View.OnClickListener)getActivity());
 		
 		return view;
     }
@@ -43,7 +44,5 @@ public class StartFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-
 	}
-
 }

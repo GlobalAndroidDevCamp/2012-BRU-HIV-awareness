@@ -47,9 +47,6 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity);
 
-		Button b = (Button) findViewById(R.id.button1);
-		b.setOnClickListener(this);
-
 		// Check for available NFC Adapter
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (mNfcAdapter == null) {
@@ -81,14 +78,15 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			FragmentTransaction transaction = fragmentManager
 					.beginTransaction();
 
+			StartedFragment sf = new StartedFragment();
 			// Replace whatever is in the fragment_container view with this
 			// fragment,
 			// and add the transaction to the back stack
-			transaction.replace(R.id.fragment_container,
-					fragmentManager.findFragmentById(R.id.start_fragment));// TODO
+			transaction.remove(fragmentManager.findFragmentById(R.id.start_fragment));
+			transaction.add(R.id.fragment_container, sf);
 			transaction
 					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-			transaction.addToBackStack(null);
+			transaction.addToBackStack("started");
 
 			// Commit the transaction
 			transaction.commit();
@@ -103,6 +101,11 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 									+ (Probability.fromData(mGender, mEthnic) * Probability.scale));
 				}
 			}
+		}else if (v.getId() == R.id.startover_button) {
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			fragmentManager.popBackStack();
+			
+			caught = 0;
 		}
 	}
 
