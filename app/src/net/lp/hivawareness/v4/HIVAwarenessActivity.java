@@ -91,6 +91,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
 			mNfcAdapter.disableForegroundNdefPush(this);
 			mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
+			//mNfcAdapter.setNdefPushMessage(createNdefMessage(), this);
 
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			FragmentTransaction transaction = fragmentManager
