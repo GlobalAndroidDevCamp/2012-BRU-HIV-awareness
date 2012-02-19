@@ -37,31 +37,34 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	private boolean ran = false;
 	private IntentFilter[] mIntentFiltersArray;
 	private String[][] mTechListsArray;
-	private PendingIntent mPendingIntent;	
+	private PendingIntent mPendingIntent;
 	public Gender mGender;
 	public Region mRegion;
+
+	final static private boolean DEBUG = true;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity);
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		mGender = Gender.valueOf(prefs.getString("gender", "male"));
-		
+
 		String region = prefs.getString("region", null);
-		if (region == null){
+		if (region == null) {
 			mRegion = null;
 		}
 		calculateInitial(mRegion == null);
-	
+
 		// Check for available NFC Adapter
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (mNfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
-					.show();			
-		} 
+					.show();
+		}
 		mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
 				getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
@@ -73,21 +76,22 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 		mIntentFiltersArray = new IntentFilter[] { ndef };
 		mTechListsArray = new String[][] { new String[] { NfcF.class.getName() } };
-		
-		
+
 	}
 
 	public void onClick(View v) {
 		if (v.getId() == R.id.button1) {
-			int genderPos = ((Spinner)findViewById(R.id.spinner_gender)).getSelectedItemPosition();
+			int genderPos = ((Spinner) findViewById(R.id.spinner_gender))
+					.getSelectedItemPosition();
 			mGender = Gender.values()[genderPos];
-			
-			int regionPos = ((Spinner)findViewById(R.id.spinner_region)).getSelectedItemPosition();
+
+			int regionPos = ((Spinner) findViewById(R.id.spinner_region))
+					.getSelectedItemPosition();
 			mRegion = Region.values()[regionPos];
 
 			mNfcAdapter.disableForegroundNdefPush(this);
 			mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
-			
+
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			FragmentTransaction transaction = fragmentManager
 					.beginTransaction();
@@ -96,7 +100,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			// Replace whatever is in the fragment_container view with this
 			// fragment,
 			// and add the transaction to the back stack
-			transaction.remove(fragmentManager.findFragmentById(R.id.start_fragment));
+			transaction.remove(fragmentManager
+					.findFragmentById(R.id.start_fragment));
 			transaction.add(R.id.fragment_container, sf);
 			transaction
 					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
@@ -106,24 +111,14 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			transaction.commit();
 
 			calculateInitial(false);
-			
-			TextView tv = ((TextView)findViewById(R.id.debug));
-			if(tv!=null){
-				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
-			}
-		}else if (v.getId() == R.id.startover_button) {
+		} else if (v.getId() == R.id.startover_button) {
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.popBackStack();
-			
+
 			mGender = Gender.male;
 			mRegion = null;
-			
+
 			calculateInitial(true);
-			
-			TextView tv = ((TextView)findViewById(R.id.debug));
-			if(tv!=null){
-				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
-			}
 		}
 	}
 
@@ -131,15 +126,25 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	 * 
 	 */
 	protected void calculateInitial(boolean worldCitizen) {
-		if (!ran) {//TODO: add to preferences
-			double prob;
+		double prob = 0;
+		if (!ran) {// TODO: add to preferences
 			if (worldCitizen) {
 				prob = Probability.worldwide * Probability.scale;
 			} else {
-				prob = Probability.fromData(mGender, mRegion) * Probability.scale;
+				prob = Probability.fromData(mGender, mRegion)
+						* Probability.scale;
 			}
-			caught = (int) Math.floor(Math.random()
-					+ Math.min(1, prob));
+			caught = (int) Math.floor(Math.random() + Math.min(1, prob));
+		}
+
+		TextView tv = ((TextView) findViewById(R.id.debug));
+		if (DEBUG) {
+			if (tv != null) {
+				tv.setText("caught=" + caught + ", Gender="
+						+ mGender.toString() + ", Region="
+						+ (mRegion == null ? "world" : mRegion.toString())
+						+ ", Prob=" + prob);
+			}
 		}
 	}
 
@@ -207,7 +212,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
 		String data = new String(msg.getRecords()[0].getPayload());
 		String[] parts = data.split("\\|");
-		
+
 		// record 0 contains the MIME type, record 1 is the AAR, if present
 		Log.v("HIV", "old status " + caught);
 
@@ -244,13 +249,17 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			}
 
 			double random = Math.random();
-			caught = (int) Math.floor(random + (factor * Probability.scale));
-			
-			TextView tv = ((TextView)findViewById(R.id.debug));
-			if(tv!=null){
-				tv.setText("caught="+caught+", Gender="+mGender.toString()+", Region="+mRegion.toString());
+			caught = (int) Math.floor(random + (factor * Probability.scale));// TODO
+
+			if (DEBUG) {
+				TextView tv = ((TextView) findViewById(R.id.debug));
+				if (tv != null) {
+					tv.setText("caught=" + caught + ", Gender="
+							+ mGender.toString() + ", Region="
+							+ (mRegion == null ? "world" : mRegion.toString())
+							+ ", Prob=" + (factor * Probability.scale));
+				}
 			}
-			
 		}
 	}
 
