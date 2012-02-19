@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/share"
-          android:icon="@drawable/ic_action_share"
-          android:title="Share" android:showAsAction="ifRoom">
+    <item android:id="@+id/start_over"
+          android:icon="@android:drawable/ic_menu_revert"
+          android:title="Start Over" android:showAsAction="ifRoom">
     </item>
-    <item android:id="@+id/item1" android:showAsAction="ifRoom" android:title="Help" android:icon="@android:drawable/ic_menu_help"></item>
+    <item android:id="@+id/share"
+          android:icon="@android:drawable/ic_menu_share"
+          android:title="Share App" android:showAsAction="ifRoom">
+    </item>
+    <item android:id="@+id/feedback"
+          android:icon="@drawable/ic_menu_star"
+          android:title="Give Feedback" android:showAsAction="ifRoom">
+    </item>
+    <item android:id="@+id/about"
+          android:icon="@android:drawable/ic_menu_info_details"
+          android:title="About" android:showAsAction="ifRoom">
+    </item>
+    <item android:id="@+id/help" android:showAsAction="ifRoom" android:title="Help" android:icon="@android:drawable/ic_menu_help"></item>
 </menu>

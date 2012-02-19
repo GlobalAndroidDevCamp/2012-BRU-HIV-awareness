@@ -9,10 +9,16 @@
         android:id="@+id/touch_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="net.lp.hivawareness.v4.BottomFragment" >
+        android:name="net.lp.hivawareness.v4.BottomFragment"
+        android:layout_marginBottom="60dip" >
 
         <!-- Preview: layout=@layout/touch -->
     </fragment>
+    
+    <View 
+        android:background="@drawable/divider_strong_holo"
+        android:layout_width="match_parent"
+        android:layout_height="1dip"/>
     
     <fragment
         android:id="@+id/start_fragment"
