@@ -92,6 +92,17 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
     //Reflection construction because SharedPreferences.Editor.apply()/commit() is an API different in version 9.
 	public static boolean mSharedPreferences_Editor_apply_available = false;
+	
+	//Reflection construction because StrictMode was only introduced in API version 9.
+	private static boolean mStrictModeAvailable=false;
+	
+	private static boolean mBackupManagerAvailable;
+	private static BackupManagerWrapper mBackupManagerWrapper = null;
+	
+	/**
+	 * ApplicationContext
+	 */
+	private static Context applicationContext;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -145,7 +156,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 
 		// Check for available NFC Adapter
-		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		mNfcAdapter = NfcAdapter.getDefaultAdapter(HIVAwarenessActivity.getAppCtxt());
 		if (mNfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
 					.show();
@@ -177,9 +188,6 @@ public class HIVAwarenessActivity extends FragmentActivity implements
             Log.i(TAG, "Strict mode not available.");
 		}
 	}
-	
-	//Reflection construction because StrictMode was only introduced in API version 9.
-	private static boolean mStrictModeAvailable=false;
 
 	/* establish whether the "StrictMode" functionality is available to us on this platform version */
 	static {
@@ -213,9 +221,6 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 	}
 	
-	private static boolean mBackupManagerAvailable;
-	private static BackupManagerWrapper mBackupManagerWrapper = null;
-	
 	/* establish whether the "BackupManager" functionality is available to us on this platform version */
 	static {
 		try {
@@ -225,11 +230,6 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			mBackupManagerAvailable = false;
 		}
 	}
-	
-	/**
-	 * ApplicationContext
-	 */
-	private static Context applicationContext;
 
     /**
      * Gets the application context.
@@ -472,8 +472,16 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		try {
 			removeDialog(SMOKING_DIALOG_ID);
 		} catch (IllegalArgumentException e) {
-			//nothing
+			//nothing 
 		}
+		
+		if(mNfcAdapter!=null){
+			mNfcAdapter.disableForegroundNdefPush(this);
+			mNfcAdapter.disableForegroundDispatch(this);
+		}
+		mNfcAdapter = null;
+		
+		mPendingIntent = null;
 		
 		//End analytics session. //FIXEDBUG: moved from Collectionista.onTerminate() because that method is not always called.
 		if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEndSession(this);
@@ -583,7 +591,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	 */
 	protected void calculateInitial(boolean worldCitizen) {
 		double prob = 0;
-		if (!ran) {// TODO: add to preferences
+		if (!ran) {
 			if (worldCitizen) {
 				prob = Probability.worldwide * Probability.scale;
 			} else {

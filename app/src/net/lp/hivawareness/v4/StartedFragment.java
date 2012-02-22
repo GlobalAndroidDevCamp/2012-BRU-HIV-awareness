@@ -22,7 +22,6 @@ public class StartedFragment extends Fragment {
 	 * 
 	 */
 	public StartedFragment() {
-		// TODO Auto-generated constructor stub
 	}
 	
     @Override

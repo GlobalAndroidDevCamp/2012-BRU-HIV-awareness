@@ -20,7 +20,6 @@ public class BottomFragment extends Fragment {
 	 * 
 	 */
 	public BottomFragment() {
-		// TODO Auto-generated constructor stub
 	}
 	
     @Override
