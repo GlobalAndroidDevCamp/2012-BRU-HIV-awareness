@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	android:installLocation="auto"
     package="net.lp.hivawareness"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="2"
+    android:versionName="1.1" >
 
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="15" /><!--  10 is min for NFC -->
     
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
+    <uses-feature android:name="android.hardware.location.network"
+              android:required="false"/><!-- Flurry, Google Analytics -->  
+    <uses-feature android:name="android.hardware.location"
+              android:required="false"/><!-- Don't know where it comes from, but would otherwise be set to required=true. "If declared with the "android:required="true" attribute, these subfeatures implicitly declare the android.hardware.location parent feature." -->
+    <uses-feature android:name="android.hardware.touchscreen"
+              android:required="false"/><!-- any -->
+    <uses-feature android:name="android.hardware.wifi"
+              android:required="false"/><!-- any -->
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -16,17 +25,26 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Google Analytics -->
+    
+	<supports-screens android:smallScreens="true" 
+                  android:normalScreens="true"
+                  android:largeScreens="true"
+                  android:xlargeScreens="true"
+                  android:anyDensity="true" />
 
     <application
         android:icon="@drawable/logo"
         android:label="@string/app_name"
+        android:backupAgent=".util.BackupAgent"
         android:screenOrientation="sensor" 
         android:hardwareAccelerated="true" >
+        <meta-data android:name="com.google.android.backup.api_key"
+    		android:value="AEdPqrEAAAAIQLS0bdh-SHNrD9mhLg_qjttbSiiuKv5i4Gl3Pg" />
         <activity
             android:name=".v4.HIVAwarenessActivity"
             android:label="@string/app_name"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:configChanges="orientation|keyboardHidden" >
+            android:configChanges="orientation|keyboard|keyboardHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,8 +59,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".v4.AlertReceiver" />
-        <receiver android:name=".v4.AppWidgetProvider" >
+        <receiver android:name=".util.AlertReceiver" />
+        <receiver android:name=".util.AppWidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -51,6 +69,13 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
+        
+		<!-- Used for install referrer tracking -->
+		<receiver android:name="com.google.android.apps.analytics.AnalyticsReceiver" android:exported="true">
+		  <intent-filter>
+		    <action android:name="com.android.vending.INSTALL_REFERRER" />
+		  </intent-filter>
+		</receiver>
     </application>
 
 </manifest>

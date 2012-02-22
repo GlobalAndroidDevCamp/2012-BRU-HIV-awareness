@@ -31,13 +31,4 @@ public class StartedFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.started, container, false);
     }
-
-	/* (non-Javadoc)
-	 * @see android.app.Fragment#onActivityCreated(android.os.Bundle)
-	 */
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onActivityCreated(savedInstanceState);
-	}
 }

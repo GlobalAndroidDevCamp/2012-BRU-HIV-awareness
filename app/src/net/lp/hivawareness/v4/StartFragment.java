@@ -9,7 +9,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.Spinner;
 
 /**
  * @author pjv
@@ -32,18 +34,14 @@ public class StartFragment extends Fragment {
         
 		Button b = (Button) view.findViewById(R.id.button1);
 		b.setOnClickListener((View.OnClickListener)getActivity());
+
+		Spinner spinnerGender = (Spinner) view.findViewById(R.id.spinner_gender);
+		spinnerGender.setOnItemSelectedListener((OnItemSelectedListener)getActivity());
+
+		Spinner spinnerRegion = (Spinner) view.findViewById(R.id.spinner_region);
+		spinnerRegion.setOnItemSelectedListener((OnItemSelectedListener)getActivity());
 		
 		return view;
     }
-
-	/* (non-Javadoc)
-	 * @see android.app.Fragment#onActivityCreated(android.os.Bundle)
-	 */
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onActivityCreated(savedInstanceState);
-
-	}
 
 }

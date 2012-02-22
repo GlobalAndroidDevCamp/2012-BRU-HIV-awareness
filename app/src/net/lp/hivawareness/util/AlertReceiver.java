@@ -1,4 +1,4 @@
-package net.lp.hivawareness.v4;
+package net.lp.hivawareness.util;
 
 import net.lp.hivawareness.R;
 import android.app.Notification;

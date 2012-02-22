@@ -6,6 +6,10 @@ import net.lp.hivawareness.R;
 import net.lp.hivawareness.domain.Gender;
 import net.lp.hivawareness.domain.Probability;
 import net.lp.hivawareness.domain.Region;
+import net.lp.hivawareness.util.AlertReceiver;
+import net.lp.hivawareness.util.AnalyticsUtils;
+import net.lp.hivawareness.util.BackupManagerWrapper;
+import net.lp.hivawareness.util.StrictModeWrapper;
 
 import org.openintents.intents.AboutIntents;
 
@@ -41,12 +45,28 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+import com.flurry.android.FlurryAgent;
+
 public class HIVAwarenessActivity extends FragmentActivity implements
-		OnClickListener {
+		OnClickListener, OnItemSelectedListener {
+
+	public static final String TAG = "HIVAwareness ";
+
+    public static final String FLURRY_API_KEY = "6KUCCX2TRBJUZ9BEUI1M";
+    public static final String GOOGLE_ANALYTICS_WEB_PROPERTY_ID = "UA-29415573-1";
+	public static final String BUGSENSE_API_KEY = "693a8e4a";
+
+	/**
+	 * Id for the preferences registry.
+	 */
+	public static final String PREFS ="HIVAwarenessPrefs";
 	private static final String PREFS_GENDER = "gender";
 	private static final String PREFS_REGION = "region";
 	private static final String PREFS_INFECTED = "infected";
@@ -62,7 +82,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	public Gender mGender;
 	public Region mRegion;
 
-	final static private boolean DEBUG = false;
+	final static public boolean DEBUG = true;
 
 	/**
 	 * Dialog ids
@@ -70,15 +90,48 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	public static final int HELP_DIALOG_ID = 0;
 	public static final int SMOKING_DIALOG_ID = 1;
 
+    //Reflection construction because SharedPreferences.Editor.apply()/commit() is an API different in version 9.
+	public static boolean mSharedPreferences_Editor_apply_available = false;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity);
 
-		// initialize values
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
+    	//Save ApplicationContext
+        applicationContext = this.getApplicationContext();
+		
+		enableStrictMode();
+
+        //Load the default preferences values. Should be done first at every entry into the app.
+
+		if(DEBUG && mStrictModeAvailable){
+			StrictModeWrapper.allowThreadDiskWrites();//disables temporarily, reenables below
+		}
+        
+		PreferenceManager.setDefaultValues(HIVAwarenessActivity.getAppCtxt(), PREFS, MODE_PRIVATE, R.xml.preferences, true);
+		
+		enableStrictMode();//reenables
+
+        //Enable analytics session. Should be first (at least before any Flurry calls).
+    	if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onStartSession(this, HIVAwarenessActivity.FLURRY_API_KEY);
+    	
+        if(!DEBUG){
+        	//BugSense uncaught exceptions analytics.
+        	BugSenseHandler.setup(this, BUGSENSE_API_KEY); 
+        }
+
+		if (mBackupManagerAvailable) {
+			mBackupManagerWrapper = new BackupManagerWrapper(this);//TODO: should this be app context?
+			Log.i(TAG, "BackupManager API available.");
+		} else {
+			Log.i(TAG, "BackupManager API not available.");
+		}
+
+		//Obtain a connection to the preferences.
+		SharedPreferences prefs =getSharedPreferences(PREFS, MODE_PRIVATE);
+		
 		mGender = Gender.valueOf(prefs.getString(PREFS_GENDER, "male"));
 
 		String region = prefs.getString(PREFS_REGION, null);
@@ -111,8 +164,119 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
 	}
 
+	/**
+	 * 
+	 */
+	private void enableStrictMode() {
+		if(DEBUG && mStrictModeAvailable){
+            Log.i(TAG, "Strict mode available.");
+            
+			StrictModeWrapper.setThreadPolicy();
+			StrictModeWrapper.setVmPolicy();
+		} else {
+            Log.i(TAG, "Strict mode not available.");
+		}
+	}
+	
+	//Reflection construction because StrictMode was only introduced in API version 9.
+	private static boolean mStrictModeAvailable=false;
+
+	/* establish whether the "StrictMode" functionality is available to us on this platform version */
+	static {
+		try {
+			StrictModeWrapper.checkAvailable();
+			mStrictModeAvailable = true;
+		} catch (Throwable t) {
+			mStrictModeAvailable = false;
+		}
+	}
+	
+	static {
+		initCompatibility();
+	};
+
+	private static void initCompatibility() {
+		//mSharedPreferences_Editor_apply
+		try {
+			SharedPreferences.Editor.class.getMethod(
+					"apply", (Class[]) null );
+			/* success, this is a newer device */
+			mSharedPreferences_Editor_apply_available = true;
+		} catch (NoSuchMethodException nsme) {
+			/* failure, must be older device */
+		}
+	}
+
+	public static void dataChanged() {
+		if (mBackupManagerWrapper != null) {
+			mBackupManagerWrapper.dataChanged();
+		}
+	}
+	
+	private static boolean mBackupManagerAvailable;
+	private static BackupManagerWrapper mBackupManagerWrapper = null;
+	
+	/* establish whether the "BackupManager" functionality is available to us on this platform version */
+	static {
+		try {
+			BackupManagerWrapper.checkAvailable();
+			mBackupManagerAvailable = true;
+		} catch (Throwable t) {
+			mBackupManagerAvailable = false;
+		}
+	}
+	
+	/**
+	 * ApplicationContext
+	 */
+	private static Context applicationContext;
+
+    /**
+     * Gets the application context.
+     * 
+     * @return application context
+     */
+    public static Context getAppCtxt(){
+    	if(applicationContext==null){
+    		throw new IllegalArgumentException("Application context is still null.");
+    	}
+        return applicationContext;
+    }
+
+	public void onItemSelected(AdapterView<?> parent, View view, int position,
+			long id) {
+		if (parent.getId() == R.id.spinner_gender) {
+
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("spinner_gender");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "SpinnerGenderItemSelected", this.getLocalClassName()+".Spinner_Gender_"+Gender.values()[position], position);
+		} else if (parent.getId() == R.id.spinner_region) {
+
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("spinner_region");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "SpinnerRegionItemSelected", this.getLocalClassName()+".Spinner_Region_"+Region.values()[position], position);
+		}
+	}
+
+	public void onNothingSelected(AdapterView<?> parent) {
+		if (parent.getId() == R.id.spinner_gender) {
+
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("spinner_gender");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "SpinnerGenderNothingSelected", this.getLocalClassName()+".Spinner_Gender_nothing", 0);
+		} else if (parent.getId() == R.id.spinner_region) {
+
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("spinner_region");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "SpinnerRegionNothingSelected", this.getLocalClassName()+".Spinner_Region_nothing", 0);
+		}
+	}
+
 	public void onClick(View v) {
 		if (v.getId() == R.id.button1) {
+
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("start");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "Start", this.getLocalClassName()+".Menu_Throw the dice", 0);
+
+			if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onPageView();
+			AnalyticsUtils.getInstance().trackGAPageView("/MainStarted", "");
+			
 			int genderPos = ((Spinner) findViewById(R.id.spinner_gender))
 					.getSelectedItemPosition();
 
@@ -168,12 +332,19 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.about: {
+			
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("about");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "About", this.getLocalClassName()+".Menu_About", 0);
+
 
 			// Show the about dialog for this app.
 			showAboutDialog();
 			return true;
 		}
 		case R.id.feedback: {
+			
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("feedback");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "Feedback", this.getLocalClassName()+".Menu_Give Feedback", 0);
 
 			// Send out the feedback intent with a chooser
 			startActivity(new Intent(Intent.ACTION_VIEW,
@@ -181,6 +352,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			return true;
 		}
 		case R.id.share: {
+			
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("share");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "Share", this.getLocalClassName()+".Menu_Share App", 0);
 
 			// Send out the send/share_app intent with a chooser, and with a
 			// template text
@@ -198,7 +372,14 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			return true;
 		}
 		case R.id.start_over: {
+			
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("start_over");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "StartOver", this.getLocalClassName()+".Menu_Start Over", 0);
 
+
+			if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onPageView();
+			AnalyticsUtils.getInstance().trackGAPageView("/Main", "StartOver");
+			
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.popBackStack();
 
@@ -209,6 +390,10 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			return true;
 		}
 		case R.id.help: {
+			
+	        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("help");
+			AnalyticsUtils.getInstance().trackGAEvent("Main", "help", this.getLocalClassName()+".Menu_Help", 0);
+
 			showDialog(HELP_DIALOG_ID);
 		}
 		}
@@ -238,6 +423,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	 * Prepare dialog for help.
 	 */
 	public Dialog createHelpDialog() {
+        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("show_help_dialog");
+		AnalyticsUtils.getInstance().trackGAEvent("Main", "ShowHelpDialog");
 
 		// Launch dialog to ask for action
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -253,6 +440,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	 * Prepare dialog for afterwards (smoking).
 	 */
 	public Dialog createSmokingDialog() {
+        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("show_smoking_dialog");
+		AnalyticsUtils.getInstance().trackGAEvent("Main", "ShowSmokingDialog");
+		
 		Dialog dialog = new Dialog(this);
 
 		dialog.setContentView(R.layout.smoking_toast);
@@ -285,9 +475,17 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			//nothing
 		}
 		
+		//End analytics session. //FIXEDBUG: moved from Collectionista.onTerminate() because that method is not always called.
+		if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEndSession(this);
+
+		// Stop the TRACKER when it is no longer needed.
+		AnalyticsUtils.getInstance().stopTracker();
 	}
 	
 	private void showAboutDialog() {
+		if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onPageView();
+		AnalyticsUtils.getInstance().trackGAPageView("/About", "");
+		
 		Intent intent = new Intent(AboutIntents.ACTION_SHOW_ABOUT_DIALOG);
 
 		// Supply the image name and package.
@@ -305,8 +503,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 					getPackageName(), 0);
 			version = pi.versionName;
 		} catch (PackageManager.NameNotFoundException e) {
-			// analytics error
-		}
+			if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onError("HIVAwarenessActivity:showAboutDialog1", "(Package name not found for about dialog)", e.getMessage());
+		    if (HIVAwarenessActivity.DEBUG) Log.e(TAG, "Package name not found", e);		}
 		;
 		intent.putExtra(AboutIntents.EXTRA_VERSION_NAME, version);
 		intent.putExtra(AboutIntents.EXTRA_COMMENTS,
@@ -347,17 +545,17 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			startActivityForResult(intent, 0);
 		} catch (ActivityNotFoundException e) {
 			try {
-				// if (!Collectionista.DEBUG)
-				// FlurryAgent.onError("CollectionsListWindow:showAboutDialog2",
-				// getString(R.string.about_backup), e.getMessage());
+				if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("show_about_oi_about_not_installed");
+	    		AnalyticsUtils.getInstance().trackGAEvent("Menu", "OIAboutNotInstalled", "HIVAwarenessActivity.MenuAbout_"+HIVAwarenessActivity.getAppCtxt().getString(R.string.about_backup), 0);
+	    		//if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onError("HIVAwarenessActivity:showAboutDialog2", getString(R.string.about_backup), e.getMessage());
 				Toast.makeText(this, getString(R.string.about_backup),
 						Toast.LENGTH_LONG).show();
 				startActivity(new Intent(Intent.ACTION_VIEW,
 						Uri.parse(getString(R.string.link_about_dialog))));
 			} catch (ActivityNotFoundException e2) {
-				// if (!Collectionista.DEBUG)
-				// FlurryAgent.onError("CollectionsListWindow:showAboutDialog3",
-				// getString(R.string.market_backup), e2.getMessage());
+				if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("show_about_market_not_installed");
+	    		AnalyticsUtils.getInstance().trackGAEvent("Menu", "MarketNotInstalled", "HIVAwarenessActivity.MenuAbout_"+HIVAwarenessActivity.getAppCtxt().getString(R.string.market_backup), 0);
+	    		//if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onError("HIVAwarenessActivity:showAboutDialog3", getString(R.string.market_backup), e2.getMessage());
 				Toast.makeText(this, getString(R.string.market_backup),
 						Toast.LENGTH_LONG).show();
 			}
@@ -365,8 +563,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	}
 
 	private void storePreferences() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		SharedPreferences prefs =getSharedPreferences(PREFS, MODE_PRIVATE);
 		Editor editor = prefs.edit();
 		editor.putString(PREFS_GENDER, mGender.name());
 
@@ -435,6 +632,12 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("window_displayed");
+		if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onPageView();
+		AnalyticsUtils.getInstance().trackGAPageView("/"+this.getLocalClassName(), "");
+
+		
 		// Check to see that the Activity started due to an Android Beam
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
 			processIntent(getIntent());
@@ -486,6 +689,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		Gender partnerGender = Gender.valueOf(parts[1]);
 		updateInfectionStatus(partnerInfected, partnerGender);
 
+        if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onEvent("touched");
+		AnalyticsUtils.getInstance().trackGAEvent("HIVAwarenessActivity", "Touched", this.getLocalClassName()+".ListClick", caught);
+
 		Log.v("HIV", "new status " + caught);
 
 		showDialog(SMOKING_DIALOG_ID);
@@ -536,8 +742,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 
 		// store history
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		SharedPreferences prefs =getSharedPreferences(PREFS, MODE_PRIVATE);
 		Editor editor = prefs.edit();
 		int history = prefs.getInt(PREFS_HISTORY, 0);
 		history++;
@@ -577,8 +782,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		am.set(AlarmManager.RTC, System.currentTimeMillis(), operation);
 		
 		// clear history
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		SharedPreferences prefs =getSharedPreferences(PREFS, MODE_PRIVATE);
 		Editor editor = prefs.edit();
 		editor.remove(PREFS_HISTORY);
 		editor.remove(PREFS_HISTORY_INFECTED);
@@ -594,21 +798,5 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 				mimeBytes, new byte[0], payload);
 		return mimeRecord;
 	}
-
-	/*
-	 * public static void showFormattedImageToast(Context context, int id,
-	 * Drawable drawable, Object... args) {
-	 * 
-	 * final View view =
-	 * LayoutInflater.from(context).inflate(R.layout.book_notification, null);
-	 * ((TextView) view.findViewById(R.id.message)).setText(
-	 * String.format(context.getText(id).toString(), args)); ((ImageView)
-	 * view.findViewById(R.id.cover)).setImageDrawable(drawable);
-	 * 
-	 * Toast toast = new Toast(context); toast.setDuration(Toast.LENGTH_LONG);
-	 * toast.setView(view);
-	 * 
-	 * toast.show(); }
-	 */
 
 }

@@ -1,6 +1,7 @@
-package net.lp.hivawareness.v4;
+package net.lp.hivawareness.util;
 
 import net.lp.hivawareness.R;
+import net.lp.hivawareness.v4.HIVAwarenessActivity;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
