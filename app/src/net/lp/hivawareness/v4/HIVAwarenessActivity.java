@@ -148,6 +148,8 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 
 		if (caught == -1) {
 			calculateInitial(mRegion == null);
+		}else{
+			
 		}
 
 		// Check for available NFC Adapter
@@ -259,28 +261,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			int genderPos = ((Spinner) findViewById(R.id.spinner_gender))
 					.getSelectedItemPosition();
 
-			if (!(DEBUG && mNfcAdapter == null)) {
-				mNfcAdapter.disableForegroundNdefPush(this);
-				mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
-			}
-
-			FragmentManager fragmentManager = getSupportFragmentManager();
-			android.support.v4.app.FragmentTransaction transaction = fragmentManager
-					.beginTransaction();
-
-			StartedFragment sf = new StartedFragment();
-			// Replace whatever is in the fragment_container view with this
-			// fragment,
-			// and add the transaction to the back stack
-			transaction.remove(fragmentManager
-					.findFragmentById(R.id.start_fragment));
-			transaction.add(R.id.fragment_container, sf);
-			transaction
-					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-			transaction.addToBackStack("started");
-
-			// Commit the transaction
-			transaction.commit();
+			goToStartedFragment();
 
 			// use new values
 			mGender = Gender.values()[genderPos];
@@ -302,6 +283,34 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			}
 
 		}
+	}
+
+	/**
+	 * Make transaction to "started" fragment because the form was filled.
+	 */
+	protected void goToStartedFragment() {
+		if (!(DEBUG && mNfcAdapter == null)) {
+			mNfcAdapter.disableForegroundNdefPush(this);
+			mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
+		}
+		
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		android.support.v4.app.FragmentTransaction transaction = fragmentManager
+				.beginTransaction();
+
+		StartedFragment sf = new StartedFragment();
+		// Replace whatever is in the fragment_container view with this
+		// fragment,
+		// and add the transaction to the back stack
+		transaction.remove(fragmentManager
+				.findFragmentById(R.id.start_fragment));
+		transaction.add(R.id.fragment_container, sf);
+		transaction
+				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+		transaction.addToBackStack("started");
+
+		// Commit the transaction
+		transaction.commit();
 	}
 
 	/*
@@ -643,6 +652,10 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		NotificationManager nm = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(1);
+		
+		if(caught!=-1){
+			goToStartedFragment();
+		}
 	}
 
 	@Override
