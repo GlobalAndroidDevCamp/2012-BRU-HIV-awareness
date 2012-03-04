@@ -147,11 +147,8 @@ public class AnalyticsUtils {
 
             // Close out so we never run this block again, unless app is removed & =
             // reinstalled.
-			if (HIVAwarenessActivity.mSharedPreferences_Editor_apply_available){
-				prefs.edit().putBoolean(FIRST_RUN_KEY, false).apply();
-			}else{
-				prefs.edit().putBoolean(FIRST_RUN_KEY, false).commit();
-			}
+			prefs.edit().putBoolean(FIRST_RUN_KEY, false).apply();
+			HIVAwarenessActivity.dataChanged();
         }
     }
 

@@ -55,20 +55,17 @@ public class BackupAgent extends BackupAgentHelper {
 
 	    // Allocate a backup agent helper for shared preferences and add it to the backup agent
 		SharedPreferencesBackupHelper sharedPreferencesBackupHelper = 
-			new SharedPreferencesBackupHelper(HIVAwarenessActivity.getAppCtxt(), new String[]{HIVAwarenessActivity.PREFS});
+			new SharedPreferencesBackupHelper(this.getApplicationContext(), new String[]{HIVAwarenessActivity.PREFS});
         addHelper(PREFS_BACKUP_KEY, sharedPreferencesBackupHelper);
 	}
 
 	@Override
 	public void onRestore(BackupDataInput data, int appVersionCode,
 	        ParcelFileDescriptor newState) throws IOException {
+		super.onRestore(data, appVersionCode, newState);
 	    
 	    //Might be a new environment, so some stuff will have to be redone: the analytics custom values. Retrigger by reenabling first run preference value.
         SharedPreferences prefs = getSharedPreferences(HIVAwarenessActivity.PREFS, Context.MODE_PRIVATE);
-        if (HIVAwarenessActivity.mSharedPreferences_Editor_apply_available){
-        	prefs.edit().putBoolean(AnalyticsUtils.FIRST_RUN_KEY, true).apply();
-        }else{
-        	prefs.edit().putBoolean(AnalyticsUtils.FIRST_RUN_KEY, true).commit();
-        }
+        prefs.edit().putBoolean(AnalyticsUtils.FIRST_RUN_KEY, true).apply();
 	}
 }

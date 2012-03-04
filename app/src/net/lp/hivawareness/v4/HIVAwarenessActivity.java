@@ -89,9 +89,6 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 	 */
 	public static final int HELP_DIALOG_ID = 0;
 	public static final int SMOKING_DIALOG_ID = 1;
-
-    //Reflection construction because SharedPreferences.Editor.apply()/commit() is an API different in version 9.
-	public static boolean mSharedPreferences_Editor_apply_available = false;
 	
 	//Reflection construction because StrictMode was only introduced in API version 9.
 	private static boolean mStrictModeAvailable=false;
@@ -115,24 +112,18 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		
 		enableStrictMode();
 
-        //Load the default preferences values. Should be done first at every entry into the app.
-
 		if(DEBUG && mStrictModeAvailable){
 			StrictModeWrapper.allowThreadDiskWrites();//disables temporarily, reenables below
 		}
-        
-		PreferenceManager.setDefaultValues(HIVAwarenessActivity.getAppCtxt(), PREFS, MODE_PRIVATE, R.xml.preferences, true);
 		
-		enableStrictMode();//reenables
-
-        //Enable analytics session. Should be first (at least before any Flurry calls).
-    	if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onStartSession(this, HIVAwarenessActivity.FLURRY_API_KEY);
-    	
         if(!DEBUG){
         	//BugSense uncaught exceptions analytics.
         	BugSenseHandler.setup(this, BUGSENSE_API_KEY); 
         }
 
+        //Enable analytics session. Should be first (at least before any Flurry calls).
+    	if (!HIVAwarenessActivity.DEBUG) FlurryAgent.onStartSession(this, HIVAwarenessActivity.FLURRY_API_KEY);
+    	
 		if (mBackupManagerAvailable) {
 			mBackupManagerWrapper = new BackupManagerWrapper(this);//TODO: should this be app context?
 			Log.i(TAG, "BackupManager API available.");
@@ -140,8 +131,12 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			Log.i(TAG, "BackupManager API not available.");
 		}
 
+        //Load the default preferences values. Should be done first at every entry into the app.
+		PreferenceManager.setDefaultValues(HIVAwarenessActivity.getAppCtxt(), PREFS, MODE_PRIVATE, R.xml.preferences, false);
+		HIVAwarenessActivity.dataChanged();
+		
 		//Obtain a connection to the preferences.
-		SharedPreferences prefs =getSharedPreferences(PREFS, MODE_PRIVATE);
+		SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
 		
 		mGender = Gender.valueOf(prefs.getString(PREFS_GENDER, "male"));
 
@@ -160,6 +155,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		if (mNfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG)
 					.show();
+			if (!DEBUG) finish();
 		}
 		mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
 				getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
@@ -172,7 +168,6 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 		mIntentFiltersArray = new IntentFilter[] { ndef };
 		mTechListsArray = new String[][] { new String[] { NfcF.class.getName() } };
-
 	}
 
 	/**
@@ -196,22 +191,6 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			mStrictModeAvailable = true;
 		} catch (Throwable t) {
 			mStrictModeAvailable = false;
-		}
-	}
-	
-	static {
-		initCompatibility();
-	};
-
-	private static void initCompatibility() {
-		//mSharedPreferences_Editor_apply
-		try {
-			SharedPreferences.Editor.class.getMethod(
-					"apply", (Class[]) null );
-			/* success, this is a newer device */
-			mSharedPreferences_Editor_apply_available = true;
-		} catch (NoSuchMethodException nsme) {
-			/* failure, must be older device */
 		}
 	}
 
@@ -280,8 +259,10 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			int genderPos = ((Spinner) findViewById(R.id.spinner_gender))
 					.getSelectedItemPosition();
 
-			mNfcAdapter.disableForegroundNdefPush(this);
-			mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
+			if (!(DEBUG && mNfcAdapter == null)) {
+				mNfcAdapter.disableForegroundNdefPush(this);
+				mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
+			}
 
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			android.support.v4.app.FragmentTransaction transaction = fragmentManager
@@ -582,8 +563,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 
 		editor.putInt(PREFS_INFECTED, caught);
-		editor.commit();
-
+		
+		editor.apply();
+		HIVAwarenessActivity.dataChanged();
 	}
 
 	/**
@@ -652,10 +634,12 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 
 		// TODO sending messages at the same time do not work !race condition
-		mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
-		mNfcAdapter.enableForegroundDispatch(this, mPendingIntent,
-				mIntentFiltersArray, mTechListsArray);
-
+		if (!(DEBUG && mNfcAdapter == null)) {
+			mNfcAdapter.enableForegroundNdefPush(this, createNdefMessage());
+			mNfcAdapter.enableForegroundDispatch(this, mPendingIntent,
+					mIntentFiltersArray, mTechListsArray);
+		}
+		
 		NotificationManager nm = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(1);
@@ -750,7 +734,7 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		}
 
 		// store history
-		SharedPreferences prefs =getSharedPreferences(PREFS, MODE_PRIVATE);
+		SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
 		Editor editor = prefs.edit();
 		int history = prefs.getInt(PREFS_HISTORY, 0);
 		history++;
@@ -761,7 +745,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 			int historyInfected = history;
 			editor.putInt(PREFS_HISTORY_INFECTED, historyInfected);
 		}
-		editor.commit();
+		
+		editor.apply();
+		HIVAwarenessActivity.dataChanged();
 
 		// game over after 5 touches
 		if (history > 5) {
@@ -794,7 +780,9 @@ public class HIVAwarenessActivity extends FragmentActivity implements
 		Editor editor = prefs.edit();
 		editor.remove(PREFS_HISTORY);
 		editor.remove(PREFS_HISTORY_INFECTED);
-		editor.commit();
+		
+		editor.apply();
+		HIVAwarenessActivity.dataChanged();
 	}
 
 	/**
